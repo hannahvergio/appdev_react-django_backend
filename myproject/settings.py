@@ -1,23 +1,18 @@
+import os
 from decouple import config
 import dj_database_url
 from pathlib import Path
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY', default='your-default-secret-key')  # Ensure this is set in environment
 
-SECRET_KEY = config('SECRET_KEY', default='your-default-secret-key')
-
-
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed Hosts
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'hannahvergio.github.io',
-    'appdev-react-django-backend.onrender.com', 
-]
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'appdev-react-django-backend.onrender.com']
 
 # Installed Apps
 INSTALLED_APPS = [
@@ -45,16 +40,13 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS", 
-    default="http://localhost:5173,http://127.0.0.1:8000,https://hannahvergio.github.io", 
-    cast=lambda v: v.split(",")
-)
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", 
+    "http://127.0.0.1:8000",
+    "https://hannahvergio.github.io",
+]
 
 ROOT_URLCONF = 'myproject.urls'
-
 
 TEMPLATES = [
     {
@@ -75,9 +67,12 @@ TEMPLATES = [
 # WSGI Application
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-# Database Configuration (use DATABASE_URL for Render's database)
+
 DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3', 
+    }
 }
 
 # Authentication Password Validators
@@ -96,25 +91,36 @@ USE_TZ = True
 
 # Static Files Settings
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  
-STATICFILES_DIRS = [BASE_DIR / 'frontend/build/static'] 
 
+# WhiteNoise configuration for production to serve static files
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR.parent / 'frontend' / 'build',
+]
+# Ensure proper static file storage in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Media Files Settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Security Settings for production
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+if not DEBUG:
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Logging Configuration (to log errors in production)
+# Logging Configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -123,11 +129,16 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'django.log',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
             'propagate': True,
         },
     },
