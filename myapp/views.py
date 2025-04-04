@@ -5,10 +5,11 @@ from rest_framework import status
 from .models import Task
 from .serializers import TaskSerializer
 
-# Index view for root URL
-def index(request):
-    return HttpResponse("Hello from the root URL!")
 
+def index(request):
+    return HttpResponse("TO-DO LIST")
+
+# View to handle task list (GET and POST)
 @api_view(["GET", "POST"])
 def task_list(request):
     if request.method == "GET":
@@ -23,6 +24,7 @@ def task_list(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# View to handle task detail (PUT and DELETE)
 @api_view(["PUT", "DELETE"])
 def task_detail(request, pk):
     try:

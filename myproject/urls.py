@@ -4,6 +4,6 @@ from myapp.views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('myapp.urls')),
-    path('', index),  # This maps the root URL to the index view
+    path('api/', include('myapp.urls')), 
+    path('', index), 
 ]

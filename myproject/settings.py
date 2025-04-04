@@ -2,20 +2,21 @@ from decouple import config
 import dj_database_url
 from pathlib import Path
 
-# Base Directory
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Secret Key (Use environment variables instead of hardcoding)
+
 SECRET_KEY = config('SECRET_KEY', default='your-default-secret-key')
 
-# Debug Mode
-DEBUG = config('DEBUG', default=True, cast=bool)
+
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed Hosts
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'appdev-react-django-backend.onrender.com',
+    'hannahvergio.github.io',
+    'appdev-react-django-backend.onrender.com', 
 ]
 
 # Installed Apps
@@ -33,6 +34,7 @@ INSTALLED_APPS = [
 
 # Middleware
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -43,13 +45,17 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-# CORS Settings
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="http://localhost:5173,http://127.0.0.1:8000", cast=lambda v: v.split(","))
 
-# URL Configuration
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS", 
+    default="http://localhost:5173,http://127.0.0.1:8000,https://hannahvergio.github.io", 
+    cast=lambda v: v.split(",")
+)
+
+
 ROOT_URLCONF = 'myproject.urls'
 
-# Templates
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -69,7 +75,7 @@ TEMPLATES = [
 # WSGI Application
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-# Database Configuration
+# Database Configuration (use DATABASE_URL for Render's database)
 DATABASES = {
     'default': dj_database_url.parse(config('DATABASE_URL'))
 }
@@ -88,8 +94,41 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static Files
-STATIC_URL = 'static/'
+# Static Files Settings
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  
+STATICFILES_DIRS = [BASE_DIR / 'frontend/build/static'] 
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Security Settings for production
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging Configuration (to log errors in production)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
