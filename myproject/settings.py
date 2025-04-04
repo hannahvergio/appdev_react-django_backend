@@ -1,4 +1,3 @@
-from decouple import config
 import dj_database_url
 from pathlib import Path
 
@@ -12,7 +11,11 @@ SECRET_KEY = config('SECRET_KEY', default='your-default-secret-key')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed Hosts
-ALLOWED_HOSTS = ['appdev-react-django-backend.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'appdev-react-django-backend.onrender.com',
+]
 
 # Installed Apps
 INSTALLED_APPS = [
