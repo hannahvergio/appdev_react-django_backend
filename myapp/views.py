@@ -5,6 +5,10 @@ from rest_framework import status
 from .models import Task
 from .serializers import TaskSerializer
 
+# Index view for root URL
+def index(request):
+    return HttpResponse("Hello from the root URL!")
+
 @api_view(["GET", "POST"])
 def task_list(request):
     if request.method == "GET":
