@@ -12,7 +12,7 @@ SECRET_KEY = config('SECRET_KEY', default='your-default-secret-key')  # Ensure t
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed Hosts
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'appdev-react-django-backend.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000', 'appdev-react-django-backend.onrender.com', 'appdev-react-django-backend-1.onrender.com']
 
 # Installed Apps
 INSTALLED_APPS = [
